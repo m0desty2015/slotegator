@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="btn_container">
                 <?= Html::beginForm(['/site/transfer', 'id' => 'transfer'], 'post', ['enctype' => 'multipart/form-data']) ?>
+                <?= Html::input('hidden', 'sum',  $money) ?>
                 <p>
                     <?= Html::input('text', 'number', '', ['class' => 'form-control', 'placeholder' => 'Input Your bank account number', 'required' => 'required']) ?>
                     <br/>

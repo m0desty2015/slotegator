@@ -141,13 +141,34 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Update balance
      */
-    public static function updateBalance($balance)
+    public static function updateBalance($balance, $userId = null)
     {
         if ((!is_null($balance)) and (is_numeric($balance))) {
-            $user = User::findOne(Yii::$app->user->identity->getId());
+            $userId = (is_null($userId)) ? Yii::$app->user->identity->getId() : $userId;
+            $user = User::findOne($userId);
             $user->balance = $user->balance+$balance;
-            $user->save();
+            if ($user->save()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
+    }
+
+    /**
+     * Convert bonus points to balance
+     */
+    public static function convertToBalance($money, $userId = null)
+    {
+        if ((is_null($money)) or (is_string($money))){
+            return false;
+        }
+        $userId = (is_null($userId)) ? Yii::$app->user->identity->getId() : $userId;
+        $balance = intval($money * Yii::$app->params['moneyConversionRatio']);
+        $result = User::updateBalance($balance, $userId);
+        return $result;
     }
 
 }

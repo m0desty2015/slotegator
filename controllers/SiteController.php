@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\PrizeLimits;
+use app\models\PrizeStatusSend;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -237,6 +238,12 @@ class SiteController extends Controller
         $session = Yii::$app->session;
         if ($session->has('money')){
             $money = $session->get('money');
+            $timeValue = time();
+            if ($session->has('stamp')){
+                $session->remove('stamp');
+            }
+            $session->set('stamp', $timeValue);
+            PrizeStatusSend::updateStatus(Yii::$app->user->getId(), $money, false, $timeValue);
             return $this->render('/site/money_result', ['money' => $money]);
         } else {
             return $this->redirect('/site/prizes');
@@ -251,8 +258,7 @@ class SiteController extends Controller
         $session = Yii::$app->session;
         if ($session->has('money')){
             $money = $session->get('money');
-            $balance = intval($money * Yii::$app->params['moneyConversionRatio']);
-            User::updateBalance($balance);
+            User::convertToBalance($money);
             $session->remove('money');
             return $this->redirect('/site/prizes');
         } else {
@@ -265,7 +271,10 @@ class SiteController extends Controller
      */
     public function actionTransfer()
     {
+        $session = Yii::$app->session;
         if (Yii::$app->request->isPost){
+            PrizeStatusSend::updateStatus(Yii::$app->user->getId(), Yii::$app->request->post('sum'), true, $session->get('stamp'));
+            $session->remove('stamp');
             return $this->render('/site/money_transfer_result');
         } else {
             $session = Yii::$app->session;

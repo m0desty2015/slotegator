@@ -12,7 +12,7 @@ class m180929_134457_add_balance_column_to_user_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('user', 'balance', "float (2) DEFAULT 0");
+        $this->addColumn('user', 'balance', "float DEFAULT 0");
     }
 
     /**

@@ -6,9 +6,17 @@ use app\models\User;
 
 class UserTest extends \Codeception\Test\Unit
 {
+    public function testConvertPointsToBalance()
+    {
+        expect_that($user = User::convertToBalance(1000, 1));
+        expect_not($user = User::convertToBalance('Petrov', 1));
+        expect_not($user = User::convertToBalance(null, 1));
+    }
+
+
     public function testFindUserById()
     {
-        expect_that($user = User::findIdentity(100));
+        expect_that($user = User::findIdentity(1));
         expect($user->username)->equals('admin');
 
         expect_not(User::findIdentity(999));
